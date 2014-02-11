@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="@null" >
+
+    <com.koalcat.view.LiveBlurListView 
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+        />
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="65dip"
+        android:layout_alignParentBottom="true"
+        android:background="@null"
+        >
+        
+        <Button 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="text1"
+            android:background="@drawable/bottom"/>
+		<Button 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="text2"
+            android:background="@drawable/bottom"/>
+		<Button 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="text3"
+            android:background="@drawable/bottom"/>
+		<Button 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="text4"
+            android:background="@drawable/bottom"/>
+        
+    </LinearLayout>
+
+</RelativeLayout>
