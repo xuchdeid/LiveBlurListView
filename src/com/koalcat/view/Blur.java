@@ -16,8 +16,11 @@ import android.renderscript.ScriptIntrinsicBlur;
 
 public class Blur {
 	
-	private static final float BITMAP_SCALE = 0.5f;
-	private static final float BLUR_RADIUS = 12.0f;
+	private static final float BITMAP_SCALE_NOMAL = 0.8f;
+	private static final float BLUR_RADIUS_NOMAL = 12.0f;
+	
+	private static final float BITMAP_SCALE_FAST = 0.5f;
+	private static final float BLUR_RADIUS_FAST = 10.0f;
     
 	ScriptIntrinsicBlur theIntrinsic;
 	RenderScript rs;
@@ -27,20 +30,30 @@ public class Blur {
 		theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
 	}
 
-	public Bitmap blur(Bitmap image) {
-		int width = Math.round(image.getWidth() * BITMAP_SCALE);
-		int height = Math.round(image.getHeight() * BITMAP_SCALE);
+	public Bitmap blur(Bitmap image, boolean fast) {
+		
+		float scale = BITMAP_SCALE_NOMAL;
+		float radius = BLUR_RADIUS_NOMAL;
+		
+		if (fast) {
+			scale = BITMAP_SCALE_FAST;
+			radius = BLUR_RADIUS_FAST;
+		}
+		
+		int width = Math.round(image.getWidth() * scale);
+		int height = Math.round(image.getHeight() * scale);
 
 		Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height, false);
 		Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
 
 		Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
 		Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
-		theIntrinsic.setRadius(BLUR_RADIUS);
+		theIntrinsic.setRadius(radius);
 		theIntrinsic.setInput(tmpIn);
 		theIntrinsic.forEach(tmpOut);
 		tmpOut.copyTo(outputBitmap);
-
+		inputBitmap.recycle();
+		
 		return outputBitmap;
 	}
     

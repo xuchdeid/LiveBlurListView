@@ -7,7 +7,10 @@ package com.koalcat.view;
    |                xuchdeid  |   |___|
    |__________________________|    U U
  * */
+import com.koalcat.blurdemo.R;
+
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -16,85 +19,160 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 public class LiveBlurListView extends ListView {
 	
-	private int BLUR_HEIGHT = 65;
+	/**
+	 * Information about how tall the blur on bottom of the view wants to be.
+	 */
+	private int blur_bottom_height = 0;
 	
+	/**
+	 * Information about how tall the blur on top of the view wants to be.
+	 */
+	private int blur_top_height = 0;
+	
+	/**
+	 * Paint used for draw blur bitmap.
+	 */
 	private Paint paint;
-	private Rect mRectBlur, mRect;
-	private Bitmap mBitmap, mCanvasBitmap;
-	private Canvas mCanvas;
+	
+	/**
+	 * Rect for blur on bottom
+	 */
+	private Rect mRectBlurForBottom;
+	
+	/**
+	 * Rect for blur on top
+	 */
+	private Rect mRectBlurForTop;
+	
+	/**
+	 * Rect for clip Canvas.
+	 */
+	private Rect mRect;
+	
+	/*
+	 * Bitmap for blur on bottom.
+	 */
+	private Bitmap mCanvasBitmapforBottom;
+	
+	/**
+	 * Canvas for blur on bottom.
+	 */
+	private Canvas mCanvasforBottom;
+	
+	/*
+	 * Bitmap for blur on top.
+	 */
+	private Bitmap mCanvasBitmapforTop;
+	
+	/**
+	 * Canvas for blur on top.
+	 */
+	private Canvas mCanvasforTop;
+	
+	/**
+	 * Blur bitmap
+	 */
 	private Blur mBlur;
+	
+	/**
+	 * switch 
+	 */
 	private boolean enableBlur = true;
 	
 	public LiveBlurListView(Context context) {
-		super(context);
-		// TODO Auto-generated constructor stub
+		this(context, null, 0);
 	}
 	
 	public LiveBlurListView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		// TODO Auto-generated constructor stub
-		if (enableBlur) {
-			mBlur = new Blur(context);
-		}
-		
-		DisplayMetrics dm = context.getResources().getDisplayMetrics();
-		BLUR_HEIGHT = (int) ((BLUR_HEIGHT * (float)dm.densityDpi / 160.0f));
-		
-		View footer = new View(context);
-		LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, BLUR_HEIGHT);
-		footer.setLayoutParams(params);
-		addFooterView(footer, null, false);
-		
-		this.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		this(context, attrs, 0);
 	}
 
 	public LiveBlurListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
+		TypedArray a = context.obtainStyledAttributes(attrs,
+                R.styleable.BlurView, defStyle, 0);
+		blur_bottom_height = a.getDimensionPixelSize(R.styleable.BlurView_blur_bottom_height, 0);
+		blur_top_height = a.getDimensionPixelSize(R.styleable.BlurView_blur_top_height, 0);
+		enableBlur = a.getBoolean(R.styleable.BlurView_blur_enable, false);
+		a.recycle();
+
+		if (enableBlur) {
+			mBlur = new Blur(context);
+		}
+		
+		if (blur_bottom_height > 0) {
+			View footer = new View(getContext());
+			LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, blur_bottom_height);
+			footer.setLayoutParams(params);
+			addFooterView(footer, null, false);
+		}
+		
+		if (blur_top_height > 0) {
+			View header = new View(getContext());
+			LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, blur_top_height);
+			header.setLayoutParams(params);
+			addHeaderView(header, null, false);
+		}
+		
+		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 
-	/*@Override
-	**protected void dispatchDraw(Canvas canvas) {
-	*/
 	@Override
 	public void draw(Canvas canvas) {
 		if (enableBlur) {
-
-			final Rect blur = mRectBlur;
+			
 			final Rect rect = mRect;
 			final Paint mPaint = paint;
-			final Bitmap canvasBitmap = mCanvasBitmap;
-			final Canvas mTempCanvas = mCanvas;
-	        
-			mTempCanvas.save();
-			//mTempCanvas.clipRect(blur);
-			mTempCanvas.translate(0, -blur.top);
-			super.draw(mTempCanvas);
-			mTempCanvas.restore();
-	        
+			
+			final Rect blurbottom = mRectBlurForBottom;
+			final Bitmap canvasBitmapbottom = mCanvasBitmapforBottom;
+			final Canvas mTempCanvasbottom = mCanvasforBottom;
+			if (blur_bottom_height > 0) { 
+				mTempCanvasbottom.save();
+				mTempCanvasbottom.translate(0, -blurbottom.top);
+				super.draw(mTempCanvasbottom);
+				mTempCanvasbottom.restore();
+			}
+			
+			final Rect blurtop = mRectBlurForTop;
+			final Bitmap canvasBitmaptop = mCanvasBitmapforTop;
+			final Canvas mTempCanvastop = mCanvasforTop;
+			if (blur_top_height > 0) {
+				mTempCanvastop.save();
+				super.draw(mTempCanvastop);
+				mTempCanvastop.restore();
+			}
 
-			//mBitmap = Bitmap.createBitmap(canvasBitmap, 0, 0, blur.right - blur.left, blur.top);
-			//canvas.drawBitmap(mBitmap, null, rect, mPaint);
 			canvas.save();
 			canvas.clipRect(rect);
 			super.draw(canvas);
 			canvas.restore();
 			
-			//mBitmap = Bitmap.createBitmap(canvasBitmap, blur.left, blur.top,
-			//		blur.right - blur.left, blur.bottom - blur.top);
-			mBitmap = mBlur.blur(canvasBitmap);
-			canvas.drawBitmap(mBitmap, null, blur, mPaint);
-
-			mTempCanvas.drawColor(Color.TRANSPARENT, Mode.CLEAR);
-			//mTempCanvas.clipRect(rect);
-			
+			if (blur_bottom_height > 0) {
+				Bitmap mBitmap = mBlur.blur(canvasBitmapbottom, true);
+				canvas.drawBitmap(mBitmap, null, blurbottom, mPaint);
+				mPaint.setColor(0x18888888);
+				canvas.drawLine(blurbottom.left, blurbottom.top, blurbottom.right, blurbottom.top, mPaint);
+				mPaint.setColor(Color.BLACK);
+				mBitmap.recycle();
+				mTempCanvasbottom.drawColor(Color.TRANSPARENT, Mode.CLEAR);
+			}
+			if (blur_top_height > 0) { 
+				Bitmap mBitmap = mBlur.blur(canvasBitmaptop, true);
+				canvas.drawBitmap(mBitmap, null, blurtop, mPaint);
+				mPaint.setColor(0x18888888);
+				canvas.drawLine(blurtop.left, blurtop.bottom, blurtop.right, blurtop.bottom, mPaint);
+				mPaint.setColor(Color.BLACK);
+				mBitmap.recycle();
+				mTempCanvastop.drawColor(Color.TRANSPARENT, Mode.CLEAR);
+			}
 		} else {
 			super.draw(canvas);
 		}
@@ -119,45 +197,62 @@ public class LiveBlurListView extends ListView {
 
 	private void init() {
 		if (enableBlur) {
-			paint = new Paint();
-			//paint.setAntiAlias(true);
-			//paint.setColor(0xffbb0000);
-			//paint.setStyle(Paint.Style.STROKE);
-			mRectBlur = new Rect();
-			mRectBlur.left = 0;
-			mRectBlur.right = getWidth();
-			mRectBlur.bottom = getHeight();
-			mRectBlur.top = mRectBlur.bottom - BLUR_HEIGHT;
+			if (paint == null) paint = new Paint();
 			
-			mRect = new Rect();
+			if (mRectBlurForTop == null) mRectBlurForTop = new Rect();
+			mRectBlurForTop.left = 0;
+			mRectBlurForTop.right = getWidth();
+			mRectBlurForTop.top = 0;
+			mRectBlurForTop.bottom = blur_top_height;
+			
+			if (mRectBlurForBottom == null) mRectBlurForBottom = new Rect();
+			mRectBlurForBottom.left = 0;
+			mRectBlurForBottom.right = getWidth();
+			mRectBlurForBottom.bottom = getHeight();
+			mRectBlurForBottom.top = mRectBlurForBottom.bottom - blur_bottom_height;
+			
+			if (mRect == null) mRect = new Rect();
 			mRect.left = 0;
 			mRect.right = getWidth();
-			mRect.bottom = mRectBlur.top;
-			mRect.top = 0;
+			mRect.bottom = mRectBlurForBottom.top;
+			mRect.top = mRectBlurForTop.bottom;
 			
-			if (mCanvasBitmap != null && !mCanvasBitmap.isRecycled()) {
-				mCanvasBitmap.recycle();
+			recycle(false);
+			
+			if (blur_bottom_height > 0) {
+				mCanvasBitmapforBottom = Bitmap.createBitmap(mRectBlurForBottom.right - mRectBlurForBottom.left,
+						blur_bottom_height, Config.ARGB_8888);
+				mCanvasforBottom = new Canvas(mCanvasBitmapforBottom);
 			}
-			mCanvasBitmap = Bitmap.createBitmap(mRectBlur.right, BLUR_HEIGHT, Config.ARGB_8888);
-			mCanvas = new Canvas(mCanvasBitmap);
+			
+			if (blur_top_height > 0) {
+				mCanvasBitmapforTop = Bitmap.createBitmap(mRectBlurForTop.right - mRectBlurForTop.left,
+						blur_top_height, Config.ARGB_8888);
+				mCanvasforTop = new Canvas(mCanvasBitmapforTop);
+			}
 		}
 	}
 	
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-		recycle();
+		recycle(true);
 	}
 
-	private void recycle() {
-		if (mBitmap != null && !mBitmap.isRecycled()) {
-			mBitmap.recycle();
+	private void recycle(boolean all) {
+
+		if (mCanvasBitmapforBottom != null && !mCanvasBitmapforBottom.isRecycled()) {
+			mCanvasBitmapforBottom.recycle();
 		}
-		if (mCanvasBitmap != null && !mCanvasBitmap.isRecycled()) {
-			mCanvasBitmap.recycle();
+		
+		if (mCanvasBitmapforTop != null && !mCanvasBitmapforTop.isRecycled()) {
+			mCanvasBitmapforTop.recycle();
 		}
-		if (mBlur != null) {
-			mBlur.Destroy();
+		
+		if (all) {
+			if (mBlur != null) {
+				mBlur.Destroy();
+			}
 		}
 	}
 }

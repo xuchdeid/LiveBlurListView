@@ -260,9 +260,9 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 			boolean enabled = resources.getBoolean(id);
 			if (enabled) {
 				Window w = getWindow();  
-				w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS /*| 
-    	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION*/, 
-    	        		/*WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION |*/
+				w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | 
+    	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, 
+    	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION |
     	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 				//w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 
 				//WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
