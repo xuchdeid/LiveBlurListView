@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="65dip"
-    android:orientation="horizontal"
-    android:background="@null" >
+    android:orientation="horizontal" >
  
     <TextView 
         android:id="@+id/item_text"
@@ -15,7 +14,6 @@
     	android:textSize="18dip"
     	android:contentDescription="@null"
     	android:textIsSelectable="false"
-    	android:background="@null"
         />
     
     <ImageView 
@@ -25,9 +23,7 @@
     	android:layout_marginRight="20dip"
     	android:layout_alignParentRight="true"
     	android:scaleType="center"
- 
     	android:contentDescription="@null"
-    	android:background="@null"
         />
     
 </RelativeLayout>

@@ -86,16 +86,20 @@ public class LiveBlurListView extends ListView {
 	private boolean enableBlur = true;
 	
 	public LiveBlurListView(Context context) {
-		this(context, null, 0);
+		super(context);
 	}
 	
 	public LiveBlurListView(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
+		super(context, attrs);
+		setup(context, attrs, 0);
 	}
 
 	public LiveBlurListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		// TODO Auto-generated constructor stub
+		setup(context, attrs, defStyle);
+	}
+	
+	private void setup(Context context, AttributeSet attrs, int defStyle) {
 		TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.BlurView, defStyle, 0);
 		blur_bottom_height = a.getDimensionPixelSize(R.styleable.BlurView_blur_bottom_height, 0);
@@ -104,7 +108,7 @@ public class LiveBlurListView extends ListView {
 		a.recycle();
 
 		if (enableBlur) {
-			mBlur = new Blur(context);
+			//mBlur = new Blur(context);
 		}
 		
 		if (blur_bottom_height > 0) {
@@ -161,7 +165,7 @@ public class LiveBlurListView extends ListView {
 				mPaint.setColor(0x18888888);
 				canvas.drawLine(blurbottom.left, blurbottom.top, blurbottom.right, blurbottom.top, mPaint);
 				mPaint.setColor(Color.BLACK);
-				mBitmap.recycle();
+				//mBitmap.recycle();
 				mTempCanvasbottom.drawColor(Color.TRANSPARENT, Mode.CLEAR);
 			}
 			if (blur_top_height > 0) { 
@@ -170,7 +174,7 @@ public class LiveBlurListView extends ListView {
 				mPaint.setColor(0x18888888);
 				canvas.drawLine(blurtop.left, blurtop.bottom, blurtop.right, blurtop.bottom, mPaint);
 				mPaint.setColor(Color.BLACK);
-				mBitmap.recycle();
+				//mBitmap.recycle();
 				mTempCanvastop.drawColor(Color.TRANSPARENT, Mode.CLEAR);
 			}
 		} else {
@@ -197,7 +201,11 @@ public class LiveBlurListView extends ListView {
 
 	private void init() {
 		if (enableBlur) {
-			if (paint == null) paint = new Paint();
+			
+			if (paint == null) {
+				paint = new Paint();
+				//paint.setAntiAlias(true);
+			}
 			
 			if (mRectBlurForTop == null) mRectBlurForTop = new Rect();
 			mRectBlurForTop.left = 0;
@@ -229,6 +237,10 @@ public class LiveBlurListView extends ListView {
 				mCanvasBitmapforTop = Bitmap.createBitmap(mRectBlurForTop.right - mRectBlurForTop.left,
 						blur_top_height, Config.ARGB_8888);
 				mCanvasforTop = new Canvas(mCanvasBitmapforTop);
+			}
+			
+			if (mBlur == null) {
+				mBlur = new Blur(getContext());
 			}
 		}
 	}
