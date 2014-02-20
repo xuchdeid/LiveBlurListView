@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -162,19 +163,23 @@ public class LiveBlurListView extends ListView {
 			if (blur_bottom_height > 0) {
 				Bitmap mBitmap = mBlur.blur(canvasBitmapbottom, true);
 				canvas.drawBitmap(mBitmap, null, blurbottom, mPaint);
+				//canvas.drawBitmap(canvasBitmapbottom, null, blurbottom, mPaint);
+				
 				mPaint.setColor(0x18888888);
 				canvas.drawLine(blurbottom.left, blurbottom.top, blurbottom.right, blurbottom.top, mPaint);
 				mPaint.setColor(Color.BLACK);
-				//mBitmap.recycle();
+
 				mTempCanvasbottom.drawColor(Color.TRANSPARENT, Mode.CLEAR);
 			}
 			if (blur_top_height > 0) { 
 				Bitmap mBitmap = mBlur.blur(canvasBitmaptop, true);
 				canvas.drawBitmap(mBitmap, null, blurtop, mPaint);
+				//canvas.drawBitmap(canvasBitmaptop, null, blurtop, mPaint);
+				
 				mPaint.setColor(0x18888888);
 				canvas.drawLine(blurtop.left, blurtop.bottom, blurtop.right, blurtop.bottom, mPaint);
 				mPaint.setColor(Color.BLACK);
-				//mBitmap.recycle();
+
 				mTempCanvastop.drawColor(Color.TRANSPARENT, Mode.CLEAR);
 			}
 		} else {
@@ -204,7 +209,7 @@ public class LiveBlurListView extends ListView {
 			
 			if (paint == null) {
 				paint = new Paint();
-				//paint.setAntiAlias(true);
+				paint.setAntiAlias(true);
 			}
 			
 			if (mRectBlurForTop == null) mRectBlurForTop = new Rect();
