@@ -19,6 +19,8 @@ import com.koalcat.view.LiveBlurListView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.app.ActionBar;
+import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -27,11 +29,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 public class BlurActivity extends Activity implements OnItemClickListener {
 	
@@ -51,14 +56,27 @@ public class BlurActivity extends Activity implements OnItemClickListener {
             new HashMap<ComponentName, AppInfo>(INITIAL_ICON_CACHE_CAPACITY);
 
 	LiveBlurListView mList;
+	private ActionBar mActionBar;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		canSetTranslucentFlag();
+		mActionBar = getActionBar();
+		mActionBar.hide();
+		//mActionBar.setDisplayShowCustomEnabled(true);
+		//mActionBar.setBackgroundDrawable(null);
+
+		//TextView v = new TextView(this);
+		//v.setText("hello world");
+		//v.setTextSize(25);
+		//LayoutParams l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+
+		//mActionBar.setCustomView(v, l);
+		
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_blur);
-		this.getActionBar().hide();
-		
+
 		sCollator = Collator.getInstance();
 		mUIHandler = new Handler(this.getMainLooper());
 		mList = (LiveBlurListView)findViewById(R.id.list);
@@ -72,6 +90,12 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 		mHandler = new Handler(mthread.getLooper());
 		mHandler.postDelayed(mApplicationsLoader, 500);
 	}
+	
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.blur, menu);
+        return true;
+    }
 	
 	@Override
 	public void onDestroy() {
@@ -264,6 +288,7 @@ public class BlurActivity extends Activity implements OnItemClickListener {
     	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, 
     	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION |
     	        		WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				
 				//w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 
 				//WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 

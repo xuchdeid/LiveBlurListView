@@ -7,6 +7,7 @@
     -->
     <style name="AppBaseTheme" parent="android:Theme.Holo">
         <!-- API 14 theme customizations can go here. -->
+        <item name="android:actionBarStyle">@style/actionbar</item>
     </style>
 
 </resources>
