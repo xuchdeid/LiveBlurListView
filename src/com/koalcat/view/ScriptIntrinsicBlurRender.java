@@ -6,7 +6,7 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.ScriptIntrinsicBlur;
 
-public class ScriptIntrinsicBlurRender extends Render {
+public class ScriptIntrinsicBlurRender extends RSRender {
 
 	private ScriptIntrinsicBlur theIntrinsic;
 	

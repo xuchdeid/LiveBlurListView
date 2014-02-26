@@ -8,11 +8,9 @@ package com.koalcat.view;
    |__________________________|    U U
  * */
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.renderscript.Allocation;
 import android.support.v4.util.LruCache;
 
 public class Blur {
@@ -24,7 +22,7 @@ public class Blur {
 	private static final float BITMAP_SCALE_FAST = 0.5f;
 	private static final float BLUR_RADIUS_FAST = 10.0f;
 
-	private Render mRender;
+	private BaseRender mRender;
 	
 	//GLRender gl;
 
@@ -38,8 +36,9 @@ public class Blur {
 		
 		if (!USE_RS) {
 			mRender = new ScriptIntrinsicBlurRender(context);
+			//mRender = new JNIRender();
 		} else {
-			mRender = new RSRender(context);
+			mRender = new BlurRSRender(context);
 		}
 		
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);  
@@ -54,10 +53,6 @@ public class Blur {
 	}
 
 	public Bitmap blur(Bitmap image, boolean fast) {
-		
-		/*if (USE_GL) {
-			return Blur_openGL(image, fast);
-		}*/
 
 		float scale = BITMAP_SCALE_NOMAL;
 		float radius = BLUR_RADIUS_NOMAL;
@@ -77,15 +72,8 @@ public class Blur {
 			addBitmapToMemoryCache("" + width + height, outputBitmap);
 		}
 
-		Allocation tmpIn = Allocation.createFromBitmap(mRender.rs, bitmap);
-		Allocation tmpOut = Allocation.createFromBitmap(mRender.rs, outputBitmap);
-		
-		mRender.blur(radius, tmpIn, tmpOut);
-
-		tmpOut.copyTo(outputBitmap);
+		mRender.blur(radius, bitmap, outputBitmap);
 		bitmap.recycle();
-		tmpIn.destroy();
-		tmpOut.destroy();
 		
 		return outputBitmap;
 	}

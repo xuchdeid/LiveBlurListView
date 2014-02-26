@@ -16,7 +16,7 @@ typedef struct {
     uint8_t alpha;
 } rgba;
 
-JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jobject obj, jobject bitmapIn, jobject bitmapOut, jint radius) {
+JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject obj, jobject bitmapIn, jobject bitmapOut, jint radius) {
     LOGI("Blurring bitmap...");
 
     // Properties
@@ -56,7 +56,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jo
     int wm = w - 1;
     int hm = h - 1;
     int wh = w * h;
-    int whMax = max(w, h);
+    int whMax = fmax(w, h);
     int div = radius + radius + 1;
 
     int r[wh];
@@ -88,14 +88,14 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jo
     for (y = 0; y < h; y++) {
         rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
         for (i = -radius; i <= radius; i++) {
-            p = input[yi + min(wm, max(i, 0))];
+            p = input[yi + (int)fmin(wm, fmax(i, 0))];
 
             ir = i + radius; // same as sir
 
             stack[ir][0] = p.red;
             stack[ir][1] = p.green;
             stack[ir][2] = p.blue;
-            rbs = r1 - abs(i);
+            rbs = r1 - fabs(i);
             rsum += stack[ir][0] * rbs;
             gsum += stack[ir][1] * rbs;
             bsum += stack[ir][2] * rbs;
@@ -129,7 +129,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jo
             boutsum -= stack[ir][2];
 
             if (y == 0) {
-                vmin[x] = min(x + radius + 1, wm);
+                vmin[x] = fmin(x + radius + 1, wm);
             }
             p = input[yw + vmin[x]];
 
@@ -164,7 +164,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jo
         rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
         yp = -radius * w;
         for (i = -radius; i <= radius; i++) {
-            yi = max(0, yp) + x;
+            yi = fmax(0, yp) + x;
 
             ir = i + radius; // same as sir
 
@@ -172,7 +172,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jo
             stack[ir][1] = g[yi];
             stack[ir][2] = b[yi];
 
-            rbs = r1 - abs(i);
+            rbs = r1 - fabs(i);
 
             rsum += r[yi] * rbs;
             gsum += g[yi] * rbs;
@@ -210,7 +210,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_Blur_functionToBlur(JNIEnv* env, jo
             goutsum -= stack[ir][1];
             boutsum -= stack[ir][2];
 
-            if (x == 0) vmin[y] = min(y + r1, hm) * w;
+            if (x == 0) vmin[y] = fmin(y + r1, hm) * w;
             ip = x + vmin[y];
 
             stack[ir][0] = r[ip];
