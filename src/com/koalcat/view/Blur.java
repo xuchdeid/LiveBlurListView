@@ -10,6 +10,7 @@ package com.koalcat.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 //import android.os.Build;
 import android.support.v4.util.LruCache;
 
@@ -18,8 +19,10 @@ public class Blur {
 	private static final String TAG = "Blur";
 	
 	private boolean USE_JNI = true;
+	
 	private static final float BITMAP_SCALE_NOMAL = 0.8f;
 	private static final float BLUR_RADIUS_NOMAL = 12.0f;
+	
 	private static final float BITMAP_SCALE_FAST = 0.5f;
 	private static final float BLUR_RADIUS_FAST = 10.0f;
 
@@ -28,10 +31,13 @@ public class Blur {
 	private LruCache<String, Bitmap> mMemoryCache; 
 
 	public Blur(Context context) {
-		/*int sdk = Build.VERSION.SDK_INT;
-		if (sdk >= 17) {
-			USE_JNI = false;
-		}*/
+		
+		if (!USE_JNI) {
+			int sdk = Build.VERSION.SDK_INT;
+			if (sdk < 17) {
+				USE_JNI = true;
+			}
+		}
 		
 		if (!USE_JNI) {
 			mRender = new ScriptIntrinsicBlurRender(context);
