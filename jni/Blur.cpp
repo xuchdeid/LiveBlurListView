@@ -16,6 +16,10 @@ typedef struct {
     uint8_t alpha;
 } rgba;
 
+extern "C" {
+    JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject obj, jobject bitmapIn, jobject bitmapOut, jint radius);
+};
+
 JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject obj, jobject bitmapIn, jobject bitmapOut, jint radius) {
     LOGI("Blurring bitmap...");
 
@@ -246,11 +250,11 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject
 
     LOGI ("Bitmap blurred.");
 }
-
+/*
 int min(int a, int b) {
     return a > b ? b : a;
 }
 
 int max(int a, int b) {
     return a > b ? a : b;
-}
+}*/
