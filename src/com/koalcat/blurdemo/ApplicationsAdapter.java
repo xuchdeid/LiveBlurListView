@@ -10,6 +10,7 @@ package com.koalcat.blurdemo;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,12 +40,12 @@ public class ApplicationsAdapter extends ArrayAdapter<AppInfo> implements Sectio
 			convertView = mInflater.inflate(R.layout.list_item, parent, false);
 		}
 
-		info.icon = Utilities.createIconThumbnail(info.icon, getContext());
+		//info.icon = Utilities.createIconThumbnail(info.icon, getContext());
 
-		final TextView textView = (TextView) convertView.findViewById(R.id.item_text);
+		final TextView textView = ViewHolder.get(convertView, R.id.item_text);
 		textView.setText(info.title);
         
-		final ImageView imageView = (ImageView) convertView.findViewById(R.id.item_image);
+		final ImageView imageView = ViewHolder.get(convertView, R.id.item_image);
 		imageView.setImageDrawable(info.icon);
 
 		return convertView;
@@ -66,5 +67,22 @@ public class ApplicationsAdapter extends ArrayAdapter<AppInfo> implements Sectio
 	public Object[] getSections() {
 		// TODO Auto-generated method stub
 		return alphabetIndexer.getSections();
+	}
+	
+	public static class ViewHolder {
+		@SuppressWarnings("unchecked")
+		public static <T extends View> T get(View view, int id) {
+			SparseArray<View> viewHolder = (SparseArray<View>) view.getTag();
+			if (viewHolder == null) {
+				viewHolder = new SparseArray<View>();
+				view.setTag(viewHolder);
+			}
+			View childView = viewHolder.get(id);
+			if (childView == null) {
+				childView = view.findViewById(id);
+				viewHolder.put(id, childView);
+			}
+			return (T) childView;
+		}
 	}
 }
