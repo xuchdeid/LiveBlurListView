@@ -21,7 +21,7 @@ extern "C" {
 };
 
 JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject obj, jobject bitmapIn, jobject bitmapOut, jint radius) {
-    LOGI("Blurring bitmap...");
+    //LOGI("Blurring bitmap...");
 
     // Properties
     AndroidBitmapInfo   infoIn;
@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject
     int h = infoIn.height;
     int w = infoIn.width;
 
-    LOGI("Image size is: %i %i", w, h);
+    //LOGI("Image size is: %i %i", w, h);
 
     rgba* input = (rgba*) pixelsIn;
     rgba* output = (rgba*) pixelsOut;
@@ -248,7 +248,7 @@ JNIEXPORT void JNICALL Java_com_koalcat_view_JNIRender_Blur(JNIEnv* env, jobject
     AndroidBitmap_unlockPixels(env, bitmapIn);
     AndroidBitmap_unlockPixels(env, bitmapOut);
 
-    LOGI ("Bitmap blurred.");
+    //LOGI ("Bitmap blurred.");
 }
 /*
 int min(int a, int b) {

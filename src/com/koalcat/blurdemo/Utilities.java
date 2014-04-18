@@ -132,7 +132,7 @@ public class Utilities {
             }
         }
         
-        StateListDrawable mDrawable = new StateListDrawable();
+        /*StateListDrawable mDrawable = new StateListDrawable();
 		Bitmap mBitmap = Bitmap.createBitmap(icon.getIntrinsicWidth(), icon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
 		icon.setAlpha(0x99);
 		Canvas canvas = new Canvas(mBitmap);
@@ -142,9 +142,84 @@ public class Utilities {
         
         icon.setAlpha(0xff);
         mDrawable.addState(StateSet.WILD_CARD, icon);
-        return mDrawable;
+        return mDrawable;*/
+        return icon;
     }
+    
+    public static Bitmap createIcontoBitmapThumbnail(Drawable icon, Context context) {
+        if (sIconWidth == -1) {
+            final Resources resources = context.getResources();
+            sIconWidth = sIconHeight = (int) resources.getDimension(android.R.dimen.app_icon_size);
+        }
 
+        int width = sIconWidth;
+        int height = sIconHeight;
+
+        float scale = 1.0f;
+        if (icon instanceof PaintDrawable) {
+            PaintDrawable painter = (PaintDrawable) icon;
+            painter.setIntrinsicWidth(width);
+            painter.setIntrinsicHeight(height);
+        } else if (icon instanceof BitmapDrawable) {
+            // Ensure the bitmap has a density.
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) icon;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            if (bitmap.getDensity() == Bitmap.DENSITY_NONE) {
+                bitmapDrawable.setTargetDensity(context.getResources().getDisplayMetrics());
+            }
+        }
+        int iconWidth = icon.getIntrinsicWidth();
+        int iconHeight = icon.getIntrinsicHeight();
+
+        if (width > 0 && height > 0) {
+            if (width < iconWidth || height < iconHeight || scale != 1.0f) {
+                final float ratio = (float) iconWidth / iconHeight;
+
+                if (iconWidth > iconHeight) {
+                    height = (int) (width / ratio);
+                } else if (iconHeight > iconWidth) {
+                    width = (int) (height * ratio);
+                }
+
+                final Bitmap.Config c = icon.getOpacity() != PixelFormat.OPAQUE ?
+                            Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
+                final Bitmap thumb = Bitmap.createBitmap(sIconWidth, sIconHeight, c);
+                final Canvas canvas = sCanvas;
+                canvas.setBitmap(thumb);
+                // Copy the old bounds to restore them later
+                // If we were to do oldBounds = icon.getBounds(),
+                // the call to setBounds() that follows would
+                // change the same instance and we would lose the
+                // old bounds
+                sOldBounds.set(icon.getBounds());
+                final int x = (sIconWidth - width) / 2;
+                final int y = (sIconHeight - height) / 2;
+                icon.setBounds(x, y, x + width, y + height);
+                icon.draw(canvas);
+                icon.setBounds(sOldBounds);
+                icon = new FastBitmapDrawable(thumb);
+            } else if (iconWidth < width && iconHeight < height) {
+                final Bitmap.Config c = Bitmap.Config.ARGB_8888;
+                final Bitmap thumb = Bitmap.createBitmap(sIconWidth, sIconHeight, c);
+                final Canvas canvas = sCanvas;
+                canvas.setBitmap(thumb);
+                sOldBounds.set(icon.getBounds());
+                final int x = (width - iconWidth) / 2;
+                final int y = (height - iconHeight) / 2;
+                icon.setBounds(x, y, x + iconWidth, y + iconHeight);
+                icon.draw(canvas);
+                icon.setBounds(sOldBounds);
+                icon = new FastBitmapDrawable(thumb);
+            }
+        }
+        Bitmap mBitmap = Bitmap.createBitmap(icon.getIntrinsicWidth(), icon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+		icon.setAlpha(0xff);
+		Canvas canvas = new Canvas(mBitmap);
+		icon.setBounds(new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight()));
+		icon.draw(canvas);
+        
+        return mBitmap;
+    }
     /**
      * Returns a Bitmap representing the thumbnail of the specified Bitmap.
      * The size of the thumbnail is defined by the dimension

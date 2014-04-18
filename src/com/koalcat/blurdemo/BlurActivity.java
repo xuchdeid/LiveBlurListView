@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -144,7 +145,7 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 					ResolveInfo info = apps.get(i);
 					//if (!info.activityInfo.packageName.equals(getPackageName())) {
 					AppInfo application =
-						makeAndCacheApplicationInfo(manager, appInfoCache, info, mLauncher);
+						makeAndCacheApplicationInfo(mApplicationsAdapter, manager, appInfoCache, info, mLauncher);
 					if (action.add(application) && !mStopped) {
 						mUIHandler.post(action);
 						action = new ChangeNotifier(applicationList, false);
@@ -203,7 +204,7 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 		}
 	}
     
-	private static AppInfo makeAndCacheApplicationInfo(PackageManager manager,
+	private static AppInfo makeAndCacheApplicationInfo(ApplicationsAdapter mApplicationsAdapter, PackageManager manager,
 			HashMap<ComponentName, AppInfo> appInfoCache, ResolveInfo info,
 			Context context) {
 	
@@ -218,7 +219,7 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 		if (application == null) {
 			application = new AppInfo();
 	
-			updateApplicationInfoTitleAndIcon(manager, info, application, context);
+			updateApplicationInfoTitleAndIcon(mApplicationsAdapter, manager, info, application, context);
 			application.setComponentName(componentName);
 	
 			appInfoCache.put(componentName, application);
@@ -227,7 +228,7 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 		return application;
 	}
     
-	private static void updateApplicationInfoTitleAndIcon(PackageManager manager, ResolveInfo info,
+	private static void updateApplicationInfoTitleAndIcon(ApplicationsAdapter mApplicationsAdapter, PackageManager manager, ResolveInfo info,
 			AppInfo application, Context context) {
 			application.title = info.loadLabel(manager).toString();
 		if (application.title.charAt(0) == ' ') {
@@ -244,8 +245,13 @@ public class BlurActivity extends Activity implements OnItemClickListener {
 			}
 		}
 	
-		application.icon =
-				Utilities.createIconThumbnail(info.activityInfo.loadIcon(manager), context);
+		//application.icon =
+		//		Utilities.createIconThumbnail(info.activityInfo.loadIcon(manager), context);
+		if (mApplicationsAdapter.mMemoryCache.get(application.title_py) == null) {
+			Bitmap bitmap = Utilities.createIcontoBitmapThumbnail(info.activityInfo.loadIcon(manager), context);
+			mApplicationsAdapter.mMemoryCache.put(application.title_py, bitmap);
+		}
+		
 	}
     
 	static class ApplicationInfoComparator implements Comparator<AppInfo> {
